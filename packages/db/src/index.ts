@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url"
 import { PrismaPg } from "@prisma/adapter-pg"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// http-backend runs with cwd outside this package; load DB env from this package explicitly
 config({ path: path.join(__dirname, "../.env") })
 config({ path: path.join(__dirname, "../../../.env.local") })
 
