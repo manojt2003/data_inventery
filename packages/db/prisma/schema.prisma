@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model Company {
+  id          Int         @id @default(autoincrement())
+  name        String
+  warehouses  Warehouse[]
+  products    Product[]
+}
+
+model Warehouse {
+  id          Int         @id @default(autoincrement())
+  name        String
+  companyId   Int
+  company     Company     @relation(fields: [companyId], references: [id])
+  inventories Inventory[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  sku         String      @unique
+  name        String
+  price       Decimal     @db.Decimal(12, 2)
+  description String?
+  companyId   Int
+  company     Company     @relation(fields: [companyId], references: [id])
+  
+  // Relations
+  inventories Inventory[]
+  history     InventoryHistory[]
+  suppliers   Supplier[]  @relation("ProductSuppliers")
+  
+  // Self-referencing Many-to-Many for Bundles
+  bundleItems BundleComponent[] @relation("ParentProduct")
+  partOf      BundleComponent[] @relation("ChildProduct")
+
+  @@index([sku])
+}
+
+model BundleComponent {
+  parentId    Int
+  childId     Int
+  quantity    Int
+  parent      Product @relation("ParentProduct", fields: [parentId], references: [id])
+  child       Product @relation("ChildProduct", fields: [childId], references: [id])
+
+  @@id([parentId, childId])
+}
+
+model Inventory {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  warehouseId Int
+  quantity    Int       @default(0)
+  threshold   Int       @default(10) // Low stock threshold
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([productId, warehouseId])
+}
+
+model InventoryHistory {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  change      Int      // e.g., +5 or -2
+  reason      String   // e.g., "SALE", "RESTOCK", "ADJUSTMENT"
+  createdAt   DateTime @default(now())
+  product     Product  @relation(fields: [productId], references: [id])
+}
+
+model Supplier {
+  id           Int       @id @default(autoincrement())
+  name         String
+  contactEmail String
+  products     Product[] @relation("ProductSuppliers")
+}

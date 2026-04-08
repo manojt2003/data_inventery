@@ -1,0 +1,23 @@
+{
+  "name": "http-backend",
+  "module": "../src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "tsc -p tsconfig.json"
+  },
+
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3"
+   
+  }
+}
