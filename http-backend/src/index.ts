@@ -2,6 +2,7 @@ import express from "express"
 import { createProduct, prismaClient } from "../../packages/db/src/index.ts"
 import type { Request, Response } from "express"
 import { z } from "zod"; // zod for schema validation
+import { router as alertRouter } from "./alert.ts";
 
 const app = express()
 app.use(express.json())
@@ -11,6 +12,7 @@ const router = express.Router();
 const prisma = prismaClient;
 
 app.use(router);
+app.use(alertRouter);
 
 type AppError = {
   statusCode?: number;
